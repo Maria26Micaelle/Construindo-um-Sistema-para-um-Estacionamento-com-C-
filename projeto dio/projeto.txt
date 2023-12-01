@@ -1,0 +1,88 @@
+using System;
+using System.Collections.Generic;
+
+// Classe para representar um veículo
+class Veiculo
+{
+    public string Placa { get; set; }
+    public string Modelo { get; set; }
+}
+
+// Classe para representar uma vaga de estacionamento
+class VagaEstacionamento
+{
+    public int Numero { get; set; }
+    public bool Ocupada { get; set; }
+}
+
+// Classe principal que representa o sistema de estacionamento
+class SistemaEstacionamento
+{
+    private List<Veiculo> veiculosEstacionados;
+    private List<VagaEstacionamento> vagasEstacionamento;
+
+    public SistemaEstacionamento(int totalVagas)
+    {
+        veiculosEstacionados = new List<Veiculo>();
+        vagasEstacionamento = new List<VagaEstacionamento>();
+
+        // Inicializar as vagas de estacionamento
+        for (int i = 1; i <= totalVagas; i++)
+        {
+            vagasEstacionamento.Add(new VagaEstacionamento { Numero = i, Ocupada = false });
+        }
+    }
+
+    public void EntrarNoEstacionamento(Veiculo veiculo)
+    {
+        // Verificar se há vagas disponíveis
+        VagaEstacionamento vagaDisponivel = vagasEstacionamento.Find(vaga => !vaga.Ocupada);
+
+        if (vagaDisponivel != null)
+        {
+            vagaDisponivel.Ocupada = true;
+            veiculosEstacionados.Add(veiculo);
+            Console.WriteLine($"Veículo {veiculo.Modelo} com placa {veiculo.Placa} estacionado na vaga {vagaDisponivel.Numero}.");
+        }
+        else
+        {
+            Console.WriteLine("Estacionamento lotado. Não há vagas disponíveis.");
+        }
+    }
+
+    public void SairDoEstacionamento(Veiculo veiculo)
+    {
+        VagaEstacionamento vagaOcupada = vagasEstacionamento.Find(vaga => vaga.Ocupada && veiculosEstacionados.Exists(v => v.Placa == veiculo.Placa));
+
+        if (vagaOcupada != null)
+        {
+            vagaOcupada.Ocupada = false;
+            veiculosEstacionados.RemoveAll(v => v.Placa == veiculo.Placa);
+            Console.WriteLine($"Veículo {veiculo.Modelo} com placa {veiculo.Placa} saiu do estacionamento.");
+        }
+        else
+        {
+            Console.WriteLine($"Veículo com placa {veiculo.Placa} não encontrado no estacionamento.");
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Criar um sistema de estacionamento com 10 vagas
+        SistemaEstacionamento sistemaEstacionamento = new SistemaEstacionamento(10);
+
+        // Entrar com alguns veículos no estacionamento
+        sistemaEstacionamento.EntrarNoEstacionamento(new Veiculo { Placa = "ABC1234", Modelo = "Carro A" });
+        sistemaEstacionamento.EntrarNoEstacionamento(new Veiculo { Placa = "XYZ5678", Modelo = "Carro B" });
+        sistemaEstacionamento.EntrarNoEstacionamento(new Veiculo { Placa = "123ABC", Modelo = "Carro C" });
+
+        // Sair com um veículo do estacionamento
+        sistemaEstacionamento.SairDoEstacionamento(new Veiculo { Placa = "XYZ5678", Modelo = "Carro B" });
+
+        // Entrar com mais um veículo
+        sistemaEstacionamento.EntrarNoEstacionamento(new Veiculo { Placa = "DEF9876", Modelo = "Carro D" });
+    }
+}
